@@ -1,0 +1,70 @@
+---
+name: etcd-acceptance
+
+stemcells:
+- alias: default
+  os: ubuntu-trusty
+  version: latest
+
+releases:
+- name: etcd-acceptance
+  version: latest
+- name: kubo-etcd
+  version: latest
+- name: bosh-dns
+  version: latest
+
+features:
+  use_dns_addresses: true
+
+addons:
+- name: bosh-dns
+  include:
+    stemcells:
+    - os: ubuntu-trusty
+  jobs:
+  - name: bosh-dns
+    release: bosh-dns
+    properties:
+      cache:
+        enabled: true
+
+instance_groups:
+- name: etcd-acceptance
+  azs: [z1]
+  instances: 1
+  vm_type: default
+  stemcell: default
+  networks: [{name: default}]
+  jobs:
+  - name: etcd-bosh-dns-aliases
+    release: kubo-etcd
+    consumes:
+      etcd: {from: etcd_server, deployment: etcd}
+  - name: etcd-acceptance
+    release: etcd-acceptance
+    consumes:
+      etcd: {from: etcd_server, deployment: etcd}
+    properties:
+      tls: ((tls-etcd-client))
+
+update:
+  serial: true
+  canaries: 0
+  max_in_flight: 1
+  canary_watch_time: 1000-60000
+  update_watch_time: 1000-60000
+
+variables:
+- name: etcd_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: ca
+- name: tls-etcd-client
+  type: certificate
+  options:
+    extended_key_usage:
+    - client_auth
+    ca: etcd_ca
+    common_name: etcdClient

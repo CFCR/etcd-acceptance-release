@@ -1,0 +1,17 @@
+.DS_Store
+.blobs/
+blobs/
+.dev_builds/
+dev_releases/
+config/dev.yml
+config/private.yml
+.final_builds/jobs/**/*.tgz
+.final_builds/packages/**/*.tgz
+releases/*.tgz
+src_alt
+releases/**/*.tgz
+.idea
+/*.tgz
+/bin/
+/pkg/
+deployment-vars.yml
