@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source "/var/vcap/jobs/read-availability-during-recreate/bin/setup.sh"
+
+ginkgo -v -- \
+  --config "/var/vcap/jobs/read-availability-during-recreate/config/config.json"

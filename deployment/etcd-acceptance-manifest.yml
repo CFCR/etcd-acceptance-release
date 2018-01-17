@@ -31,6 +31,7 @@ addons:
 
 instance_groups:
 - name: etcd-acceptance
+  lifecycle: errand
   azs: [z1]
   instances: 1
   vm_type: default
@@ -41,12 +42,16 @@ instance_groups:
     release: kubo-etcd
     consumes:
       etcd: {from: etcd_server, deployment: etcd}
-  - name: etcd-acceptance
+  - name: read-availability-during-recreate
     release: etcd-acceptance
     consumes:
       etcd: {from: etcd_server, deployment: etcd}
     properties:
       tls: ((tls-etcd-client))
+      director_ca: ((director-ca))
+      director_client: https://192.168.50.6:25555
+      director_client_secret: ((director-client-secret))
+      uaa_url: https://192.168.50.6:8443
 
 update:
   serial: true

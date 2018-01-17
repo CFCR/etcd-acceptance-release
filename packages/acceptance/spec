@@ -1,8 +1,5 @@
 ---
 name: acceptance
 
-dependencies:
-- golang
-
 files:
 - acceptance/**/*

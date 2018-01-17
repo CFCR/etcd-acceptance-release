@@ -1,0 +1,38 @@
+---
+name: read-availability-during-recreate
+
+packages:
+- acceptance
+- golang
+
+properties:
+  director_client:
+    description: client name for BOSH director access
+    default: admin
+  director_client_secret:
+    description: client secret for BOSH director access
+  director_ca:
+    description: CA cert for BOSH director
+  director_url:
+    description: BOSH director URL
+  uaa_url:
+    description: BOSH UAA URL
+  tls:
+    certificate:
+      description: certificate contents
+    private_key:
+      description: key contents
+    ca:
+      description: trusted ca
+
+consumes:
+- name: etcd
+  type: etcd_service
+
+templates:
+  client-ca.crt.erb: config/client-ca.crt
+  client.crt.erb: config/client.crt
+  client.key.erb: config/client.key
+  config.json.erb: config/config.json
+  run.sh.erb: bin/run
+  setup.sh: bin/setup.sh
