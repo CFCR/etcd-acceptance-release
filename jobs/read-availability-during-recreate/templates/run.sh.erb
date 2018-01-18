@@ -2,5 +2,5 @@
 
 source "/var/vcap/jobs/read-availability-during-recreate/bin/setup.sh"
 
-ginkgo -v -- \
+ginkgo -v --race -- \
   --config "/var/vcap/jobs/read-availability-during-recreate/config/config.json"

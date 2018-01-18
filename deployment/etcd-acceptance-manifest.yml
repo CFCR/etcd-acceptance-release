@@ -47,10 +47,10 @@ instance_groups:
     consumes:
       etcd: {from: etcd_server, deployment: etcd}
     properties:
-      tls: ((tls-etcd-client))
       director_ca: ((director-ca))
-      director_client: https://192.168.50.6:25555
       director_client_secret: ((director-client-secret))
+      director_url: https://192.168.50.6:25555
+      tls: ((tls-etcd-client))
       uaa_url: https://192.168.50.6:8443
 
 update:
