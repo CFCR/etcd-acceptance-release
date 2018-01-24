@@ -1,6 +1,13 @@
 #!/bin/bash
 
+log_dir="/var/vcap/sys/log/etcd-acceptance"
+
+mkdir -p "$log_dir"
+chown vcap:vcap "$log_dir"
+
 source "/var/vcap/jobs/read-availability-during-recreate/bin/setup.sh"
 
-ginkgo -v --race -- \
-  --config "/var/vcap/jobs/read-availability-during-recreate/config/config.json"
+ginkgo -v --race --focus "Experiment One" -- \
+  --config "/var/vcap/jobs/read-availability-during-recreate/config/config.json" \
+  1> >(tee -a $log_dir/read-availability-during-recreate.stdout.log) \
+  2> >(tee -a $log_dir/read-availability-during-recreate.stderr.log)

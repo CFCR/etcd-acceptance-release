@@ -1,5 +1,5 @@
 ---
-name: read-availability-during-recreate
+name: read-availability-during-network-partition
 
 packages:
 - acceptance

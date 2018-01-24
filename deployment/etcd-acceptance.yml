@@ -52,6 +52,18 @@ instance_groups:
       director_url: ((director-url))
       tls: ((tls-etcd-client))
       uaa_url: ((uaa-url))
+      turbulence_ca: ((turbulence-ca))
+  - name: read-availability-during-network-partition
+    release: etcd-acceptance
+    consumes:
+      etcd: {from: etcd_server, deployment: etcd}
+    properties:
+      director_ca: ((director-ca))
+      director_client_secret: ((director-client-secret))
+      director_url: ((director-url))
+      tls: ((tls-etcd-client))
+      uaa_url: ((uaa-url))
+      turbulence_ca: ((turbulence-ca))
 
 update:
   serial: true

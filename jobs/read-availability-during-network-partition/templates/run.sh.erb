@@ -1,0 +1,13 @@
+#!/bin/bash
+
+log_dir="/var/vcap/sys/log/etcd-acceptance"
+
+mkdir -p "$log_dir"
+chown vcap:vcap "$log_dir"
+
+source "/var/vcap/jobs/read-availability-during-network-partition/bin/setup.sh"
+
+ginkgo -v --race --focus "Experiment Two" -- \
+  --config "/var/vcap/jobs/read-availability-during-network-partition/config/config.json" \
+  1> >(tee -a $log_dir/read-availability-during-network-partition.stdout.log) \
+  2> >(tee -a $log_dir/read-availability-during-network-partition.stderr.log)

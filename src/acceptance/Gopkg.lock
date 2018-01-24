@@ -65,6 +65,12 @@
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/jfmyers9/turbulence"
+  packages = ["client","director","incident","incident/reporter","incident/selector","tasks","tasks/monit"]
+  revision = "001f0e8163eed4802c8f16c1a32c56db59854f2d"
+
+[[projects]]
   name = "github.com/mattn/go-colorable"
   packages = ["."]
   revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
@@ -157,6 +163,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a291fe88f006a93c031944dbeecb47768ba431096df87e1f83d9c81fdbc6565d"
+  inputs-digest = "2807f980fd1ac36b55a672a104c114c298295bf493dcad1f60e101fb93d13938"
   solver-name = "gps-cdcl"
   solver-version = 1

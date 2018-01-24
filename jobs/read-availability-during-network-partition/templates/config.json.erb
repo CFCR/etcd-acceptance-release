@@ -12,9 +12,9 @@ etcd_endpoints = link('etcd').instances.map { |instance| "https://#{node_name(in
 
 config = {
   endpoints: etcd_endpoints,
-  client_cert_path: "/var/vcap/jobs/read-availability-during-recreate/config/client.crt",
-  client_key_path: "/var/vcap/jobs/read-availability-during-recreate/config/client.key",
-  client_ca_path: "/var/vcap/jobs/read-availability-during-recreate/config/client-ca.crt",
+  client_cert_path: "/var/vcap/jobs/read-availability-during-network-partition/config/client.crt",
+  client_key_path: "/var/vcap/jobs/read-availability-during-network-partition/config/client.key",
+  client_ca_path: "/var/vcap/jobs/read-availability-during-network-partition/config/client-ca.crt",
   director_client: p("director_client"),
   director_client_secret: p("director_client_secret"),
   director_ca: p("director_ca"),
