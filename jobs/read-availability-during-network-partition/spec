@@ -20,19 +20,12 @@ properties:
     description: BOSH director URL
   uaa_url:
     description: BOSH UAA URL
-  tls:
-    certificate:
-      description: certificate contents
-    private_key:
-      description: key contents
-    ca:
-      description: trusted ca
-  turbulence_ca:
-    description: ca for communicating with turbulence api
 
 consumes:
 - name: etcd
   type: etcd_service
+- name: turbulence
+  type: turbulence_api
 
 templates:
   client-ca.crt.erb: config/client-ca.crt
