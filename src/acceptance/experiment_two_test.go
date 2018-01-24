@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"code.cloudfoundry.org/localip"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -53,7 +54,8 @@ var _ = Describe("Experiment Two", func() {
 		measurer.Start()
 
 		By("Isolating the ETCD 0 (z1) node")
-		clientIP := findClientIP("etcd-acceptance", director)
+		clientIP, err := localip.LocalIP()
+		Expect(err).NotTo(HaveOccurred())
 		unblockIP(cfg.DeploymentName, "etcd", "0", clientIP, director)
 		isolatedNodeIncident := createNodeIncident(turbClient, cfg.DeploymentName)
 		Expect(isolatedNodeIncident.HasTaskErrors()).To(BeFalse())
@@ -144,14 +146,4 @@ func cleanupIptables(deployment, instanceGroup, index string, director boshdir.D
 	_, err = runSSHCommand(host, 22, username, privateKey, "sudo iptables -D INPUT 1 && sudo iptables -D OUTPUT 1")
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cleanupSSHCreds(deployment, instanceGroup, index, director)).To(Succeed())
-}
-
-func findClientIP(acceptanceDeployment string, director boshdir.Director) string {
-	dep, err := director.FindDeployment(acceptanceDeployment)
-	Expect(err).NotTo(HaveOccurred())
-	infos, err := dep.VMInfos()
-	Expect(err).NotTo(HaveOccurred())
-	Expect(infos).To(HaveLen(1))
-	Expect(infos[0].IPs).To(HaveLen(1))
-	return infos[0].IPs[0]
 }

@@ -8,6 +8,12 @@
   revision = "e9dc86bbf0e5bbe6bf7ff5a6f71e048959b61f71"
 
 [[projects]]
+  branch = "master"
+  name = "code.cloudfoundry.org/localip"
+  packages = ["."]
+  revision = "b88ad0dea95cd41f302cf7eb6ed951efafaf47f2"
+
+[[projects]]
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
   revision = "b3608229437ba4dc33dae64d56a79a2a73f1f6b2"
@@ -163,6 +169,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2807f980fd1ac36b55a672a104c114c298295bf493dcad1f60e101fb93d13938"
+  inputs-digest = "fa843f83a5d8eb20bff4c5d82bfd819450e76ab481786df44aac573d4083a48d"
   solver-name = "gps-cdcl"
   solver-version = 1
