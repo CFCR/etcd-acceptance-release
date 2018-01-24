@@ -75,6 +75,7 @@ type config struct {
 	DirectorClient       string `json:"director_client"`
 	DirectorClientSecret string `json:"director_client_secret"`
 	DirectorURL          string `json:"director_url"`
+	DeploymentName       string `json:"deployment_name"`
 
 	TurbulenceHost     string `json:"turbulence_host"`
 	TurbulencePort     int    `json:"turbulence_port"`

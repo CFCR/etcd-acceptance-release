@@ -41,29 +41,31 @@ instance_groups:
   - name: etcd-bosh-dns-aliases
     release: kubo-etcd
     consumes:
-      etcd: {from: etcd_server, deployment: etcd}
+      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
   - name: read-availability-during-recreate
     release: etcd-acceptance
     consumes:
-      etcd: {from: etcd_server, deployment: etcd}
+      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
     properties:
+      deployment_name: ((etcd-deployment-name))
       director_ca: ((director-ca))
       director_client_secret: ((director-client-secret))
       director_url: ((director-url))
       tls: ((tls-etcd-client))
-      uaa_url: ((uaa-url))
       turbulence_ca: ((turbulence-ca))
+      uaa_url: ((uaa-url))
   - name: read-availability-during-network-partition
     release: etcd-acceptance
     consumes:
-      etcd: {from: etcd_server, deployment: etcd}
+      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
     properties:
+      deployment_name: ((etcd-deployment-name))
       director_ca: ((director-ca))
       director_client_secret: ((director-client-secret))
       director_url: ((director-url))
       tls: ((tls-etcd-client))
-      uaa_url: ((uaa-url))
       turbulence_ca: ((turbulence-ca))
+      uaa_url: ((uaa-url))
 
 update:
   serial: true

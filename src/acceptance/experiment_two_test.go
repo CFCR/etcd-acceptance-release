@@ -25,10 +25,10 @@ var _ = Describe("Experiment Two", func() {
 	AfterEach(func() {
 		// This repairs the cluster from the failing state
 		By("Repairing the Cluster")
-		restartEtcdNode("etcd", "etcd", "0", director)
+		restartEtcdNode(cfg.DeploymentName, "etcd", "0", director)
 
 		Eventually(func() error {
-			dep, err := director.FindDeployment("etcd")
+			dep, err := director.FindDeployment(cfg.DeploymentName)
 			Expect(err).NotTo(HaveOccurred())
 
 			vms, err := dep.VMInfos()
@@ -54,18 +54,18 @@ var _ = Describe("Experiment Two", func() {
 
 		By("Isolating the ETCD 0 (z1) node")
 		clientIP := findClientIP("etcd-acceptance", director)
-		unblockIP("etcd", "etcd", "0", clientIP, director)
-		isolatedNodeIncident := createNodeIncident(turbClient)
+		unblockIP(cfg.DeploymentName, "etcd", "0", clientIP, director)
+		isolatedNodeIncident := createNodeIncident(turbClient, cfg.DeploymentName)
 		Expect(isolatedNodeIncident.HasTaskErrors()).To(BeFalse())
 
 		By("Restarting ETCD 0 (z1)")
-		restartEtcdNode("etcd", "etcd", "0", director)
+		restartEtcdNode(cfg.DeploymentName, "etcd", "0", director)
 
 		By("Restarting ETCD 1 (z2)")
-		restartEtcdNode("etcd", "etcd", "1", director)
+		restartEtcdNode(cfg.DeploymentName, "etcd", "1", director)
 
 		By("Restarting ETCD 2 (z3)")
-		restartEtcdNode("etcd", "etcd", "2", director)
+		restartEtcdNode(cfg.DeploymentName, "etcd", "2", director)
 
 		By("Reconnecting the ETCD 0 (z1) node")
 		for _, task := range isolatedNodeIncident.TasksOfType(tasks.FirewallOptions{}) {
@@ -73,7 +73,7 @@ var _ = Describe("Experiment Two", func() {
 		}
 		isolatedNodeIncident.Wait()
 		Expect(isolatedNodeIncident.HasTaskErrors()).To(BeFalse())
-		cleanupIptables("etcd", "etcd", "0", director)
+		cleanupIptables(cfg.DeploymentName, "etcd", "0", director)
 
 		By("Stopping the measurer")
 		Expect(measurer.Stop()).To(Succeed())
@@ -101,13 +101,13 @@ func buildTurbulenceClient(cfg config) turbclient.Turbulence {
 	return turbclient.NewFactory(logger).New(turbCfg)
 }
 
-func createNodeIncident(turbClient turbclient.Turbulence) turbclient.Incident {
+func createNodeIncident(turbClient turbclient.Turbulence, deployment string) turbclient.Incident {
 	req := incident.Request{
 		Tasks: tasks.OptionsSlice{
 			tasks.FirewallOptions{},
 		},
 		Selector: selector.Request{
-			Deployment: &selector.NameRequest{Name: "etcd"},
+			Deployment: &selector.NameRequest{Name: deployment},
 			AZ:         &selector.NameRequest{Name: "z1"},
 		},
 	}

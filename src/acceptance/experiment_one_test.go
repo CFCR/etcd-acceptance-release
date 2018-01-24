@@ -18,7 +18,7 @@ var _ = Describe("Experiment One", func() {
 		measurer.Start()
 
 		By("Recreating the deployment")
-		deployment, err := director.FindDeployment("etcd")
+		deployment, err := director.FindDeployment(cfg.DeploymentName)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(deployment.Recreate(boshdir.AllOrInstanceGroupOrInstanceSlug{}, boshdir.RecreateOpts{})).To(Succeed())
 

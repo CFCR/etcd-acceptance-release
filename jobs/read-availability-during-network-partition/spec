@@ -6,6 +6,9 @@ packages:
 - golang
 
 properties:
+  deployment_name:
+    description: Deployment name for BOSH director access
+    default: etcd
   director_client:
     description: client name for BOSH director access
     default: admin
