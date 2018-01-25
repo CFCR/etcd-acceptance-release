@@ -1,7 +1,6 @@
 package main_test
 
 import (
-	"fmt"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -15,6 +14,8 @@ var _ = Describe("Experiment One", func() {
 		By("Launching the measurer")
 		measurer, err := NewUptimeMeasurer(client, time.Second)
 		Expect(err).NotTo(HaveOccurred())
+		defer cleanupMeasurer(measurer)
+
 		measurer.Start()
 
 		By("Recreating the deployment")
@@ -23,13 +24,9 @@ var _ = Describe("Experiment One", func() {
 		Expect(deployment.Recreate(boshdir.AllOrInstanceGroupOrInstanceSlug{}, boshdir.RecreateOpts{})).To(Succeed())
 
 		By("Stopping the measurer")
-		Expect(measurer.Stop()).To(Succeed())
+		measurer.Stop()
 
 		By("Fetching the measurer's counts")
-		total, failed := measurer.Counts()
-		Expect(total).To(BeNumerically(">", 0), "No reads undertaken")
-		actualDeviation := measurer.ActualDeviation()
-		By(fmt.Sprintf("Calculating the deviation of failures: total: %d, failed: %d, deviation: %.5f\n", total, failed, actualDeviation))
-		Expect(actualDeviation).To(BeNumerically("<=", cfg.ReadTolerance))
+		measurerExpectations(measurer, "<=", cfg.ReadTolerance)
 	})
 })

@@ -1,5 +1,5 @@
 ---
-name: read-availability-during-recreate
+name: read-availability-during-total-network-partition
 
 packages:
 - acceptance
@@ -7,7 +7,7 @@ packages:
 
 properties:
   deployment_name:
-    description: deployment name for BOSH director access
+    description: Deployment name for BOSH director access
     default: etcd
   director_client:
     description: client name for BOSH director access

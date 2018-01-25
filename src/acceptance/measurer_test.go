@@ -3,6 +3,7 @@ package main_test
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
@@ -21,6 +22,8 @@ type uptimeMeasurer struct {
 	interval time.Duration
 
 	client *clientv3.Client
+
+	lock *sync.Mutex
 }
 
 func NewUptimeMeasurer(client *clientv3.Client, interval time.Duration) (*uptimeMeasurer, error) {
@@ -39,10 +42,14 @@ func NewUptimeMeasurer(client *clientv3.Client, interval time.Duration) (*uptime
 		interval:  interval,
 		key:       key,
 		value:     value,
+		lock:      &sync.Mutex{},
 	}, nil
 }
 
 func (u *uptimeMeasurer) Start() {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+
 	go func() {
 		timer := time.NewTimer(u.interval)
 		for {
@@ -52,26 +59,26 @@ func (u *uptimeMeasurer) Start() {
 			case <-u.cancelled:
 				return
 			case <-timer.C:
-				u.totalCount++
 				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 				resp, err := u.client.Get(ctx, u.key)
+				u.incrementTotalCount()
 				cancel()
 				if err != nil {
-					u.failedCount++
-					fmt.Printf("Encountered failure (#%d): %s\n", u.failedCount, err.Error())
+					u.incrementFailedCount()
+					fmt.Printf("Encountered failure (#%d): %s\n", u.getFailedCount(), err.Error())
 					continue
 				}
 
 				if len(resp.Kvs) != 1 {
-					fmt.Printf("Encountered failure (#%d): Too many keys (%d)", u.failedCount, len(resp.Kvs))
-					u.failedCount++
+					fmt.Printf("Encountered failure (#%d): Too many keys (%d)", u.getFailedCount(), len(resp.Kvs))
+					u.incrementFailedCount()
 					continue
 				}
 
 				for _, kv := range resp.Kvs {
 					if string(kv.Key) != u.key || string(kv.Value) != u.value {
-						u.failedCount++
-						fmt.Printf("Encountered failure (#%d): Mismatching Values: expected %s got %s\n", u.failedCount, u.value, string(kv.Value))
+						u.incrementFailedCount()
+						fmt.Printf("Encountered failure (#%d): Mismatching Values: expected %s got %s\n", u.getFailedCount(), u.value, string(kv.Value))
 						break
 					}
 				}
@@ -80,18 +87,45 @@ func (u *uptimeMeasurer) Start() {
 	}()
 }
 
-func (u *uptimeMeasurer) Stop() error {
+func (u *uptimeMeasurer) Stop() {
 	u.cancelled <- struct{}{}
 	close(u.cancelled)
+}
 
+func (u *uptimeMeasurer) Cleanup() error {
+	<-u.cancelled
 	_, err := u.client.Delete(context.Background(), u.key)
 	return err
 }
 
-func (u uptimeMeasurer) Counts() (int, int) {
+func (u *uptimeMeasurer) incrementTotalCount() {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+
+	u.totalCount++
+}
+
+func (u *uptimeMeasurer) incrementFailedCount() {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+	u.failedCount++
+}
+
+func (u *uptimeMeasurer) getFailedCount() int {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+
+	return u.failedCount
+}
+
+func (u *uptimeMeasurer) Counts() (int, int) {
+	u.lock.Lock()
+	defer u.lock.Unlock()
 	return u.totalCount, u.failedCount
 }
 
-func (u uptimeMeasurer) ActualDeviation() float64 {
+func (u *uptimeMeasurer) ActualDeviation() float64 {
+	u.lock.Lock()
+	defer u.lock.Unlock()
 	return float64(u.failedCount) / float64(u.totalCount)
 }

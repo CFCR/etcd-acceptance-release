@@ -3,6 +3,7 @@ package main_test
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -12,6 +13,7 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/pkg/transport"
+	turbclient "github.com/jfmyers9/turbulence/client"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -20,8 +22,9 @@ var (
 	configPath string
 	cfg        config
 
-	director boshdir.Director
-	client   *clientv3.Client
+	director   boshdir.Director
+	client     *clientv3.Client
+	turbClient turbclient.Turbulence
 )
 
 func init() {
@@ -61,6 +64,27 @@ var _ = BeforeSuite(func() {
 
 	director, err = buildDirector(cfg)
 	Expect(err).NotTo(HaveOccurred())
+
+	turbClient = buildTurbulenceClient(cfg)
+})
+
+var _ = AfterEach(func() {
+	By("Waiting for all nodes to be running")
+	Eventually(func() error {
+		dep, err := director.FindDeployment(cfg.DeploymentName)
+		Expect(err).NotTo(HaveOccurred())
+
+		vms, err := dep.VMInfos()
+		Expect(err).NotTo(HaveOccurred())
+
+		for _, vm := range vms {
+			if vm.ProcessState != "running" {
+				return fmt.Errorf("Not all VMs Running (%s/%s)", vm.JobName, vm.ID)
+			}
+		}
+
+		return nil
+	}, 3*time.Minute).ShouldNot(HaveOccurred())
 })
 
 type config struct {
@@ -113,4 +137,18 @@ func buildDirector(cfg config) (boshdir.Director, error) {
 	directorCfg.TokenFunc = boshuaa.NewClientTokenSession(uaa).TokenFunc
 
 	return directorFactory.New(directorCfg, boshdir.NewNoopTaskReporter(), boshdir.NewNoopFileReporter())
+}
+
+func buildTurbulenceClient(cfg config) turbclient.Turbulence {
+	logger := boshlog.NewLogger(boshlog.LevelNone)
+
+	turbCfg := turbclient.Config{
+		Host:     cfg.TurbulenceHost,
+		Port:     cfg.TurbulencePort,
+		Username: cfg.TurbulenceUser,
+		Password: cfg.TurbulencePassword,
+		CACert:   cfg.TurbulenceCACert,
+	}
+
+	return turbclient.NewFactory(logger).New(turbCfg)
 }
