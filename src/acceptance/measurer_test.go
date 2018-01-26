@@ -47,9 +47,6 @@ func NewUptimeMeasurer(client *clientv3.Client, interval time.Duration) (*uptime
 }
 
 func (u *uptimeMeasurer) Start() {
-	u.lock.Lock()
-	defer u.lock.Unlock()
-
 	go func() {
 		timer := time.NewTimer(u.interval)
 		for {
@@ -70,7 +67,7 @@ func (u *uptimeMeasurer) Start() {
 				}
 
 				if len(resp.Kvs) != 1 {
-					fmt.Printf("Encountered failure (#%d): Too many keys (%d)", u.getFailedCount(), len(resp.Kvs))
+					fmt.Printf("Encountered failure (#%d): Unexpected number of keys (expected 1 got %d)\n", u.getFailedCount(), len(resp.Kvs))
 					u.incrementFailedCount()
 					continue
 				}

@@ -9,12 +9,6 @@ import (
 )
 
 var _ = Describe("Experiment Two", func() {
-	AfterEach(func() {
-		// This repairs the cluster from the failing state
-		By("Repairing the Cluster")
-		restartEtcdNode(cfg.DeploymentName, "etcd", "0", director)
-	})
-
 	It("maintains uptime through network partition and job restarts", func() {
 		By("Creating the measurer")
 		measurer, err := NewUptimeMeasurer(client, time.Second)
