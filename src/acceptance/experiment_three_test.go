@@ -44,7 +44,7 @@ var _ = Describe("Experiment Three", func() {
 		Expect(isolateZoneTwoIncident.HasTaskErrors()).To(BeFalse())
 
 		By("Waiting for reads to start failing")
-		Eventually(readRootKey(client), 30*time.Second).Should(HaveOccurred())
+		Eventually(readRootKey(client), 3*etcdReadTimeout).Should(HaveOccurred())
 
 		By("Starting the total network partition measurer")
 		totalNetworkPartitionMeasurer.Start()
@@ -60,7 +60,7 @@ var _ = Describe("Experiment Three", func() {
 		unIsolateNode(isolateZoneTwoIncident, cfg.DeploymentName, "1", director)
 
 		By("Waiting for reads to start succeeding")
-		Eventually(readRootKey(client), 30*time.Second).ShouldNot(HaveOccurred())
+		Eventually(readRootKey(client), 3*etcdReadTimeout).ShouldNot(HaveOccurred())
 
 		By("Starting the partial network partition measurer")
 		partialNetworkPartitionMeasurer, err := NewUptimeMeasurer(client, time.Second)

@@ -56,7 +56,7 @@ func (u *uptimeMeasurer) Start() {
 			case <-u.cancelled:
 				return
 			case <-timer.C:
-				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), etcdReadTimeout)
 				resp, err := u.client.Get(ctx, u.key)
 				u.incrementTotalCount()
 				cancel()

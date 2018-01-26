@@ -18,6 +18,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const etcdReadTimeout = 10 * time.Second
+
 var (
 	configPath string
 	cfg        config
@@ -48,17 +50,18 @@ var _ = BeforeSuite(func() {
 	Expect(decoder.Decode(&cfg)).To(Succeed())
 
 	tlsInfo := transport.TLSInfo{
-		CertFile:      cfg.ClientCertPath,
-		KeyFile:       cfg.ClientKeyPath,
-		TrustedCAFile: cfg.ClientCAPath,
+		CertFile: cfg.ClientCertPath,
+		KeyFile:  cfg.ClientKeyPath,
+		CAFile:   cfg.ClientCAPath,
 	}
 	tlsConfig, err := tlsInfo.ClientConfig()
 	Expect(err).NotTo(HaveOccurred())
 
 	client, err = clientv3.New(clientv3.Config{
-		Endpoints:   cfg.Endpoints,
-		DialTimeout: 5 * time.Second,
-		TLS:         tlsConfig,
+		DialKeepAliveTime:    30 * time.Second,
+		DialKeepAliveTimeout: 10 * time.Second,
+		Endpoints:            cfg.Endpoints,
+		TLS:                  tlsConfig,
 	})
 	Expect(err).NotTo(HaveOccurred())
 
