@@ -69,7 +69,7 @@ func unIsolateNode(incident turbclient.Incident, deployment, index string, direc
 
 func readRootKey(client *clientv3.Client) func() error {
 	return func() error {
-		ctx, cancel := context.WithTimeout(context.Background(), etcdReadTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), etcdOperationTimeout)
 		defer cancel()
 
 		_, err := client.Get(ctx, "/")

@@ -31,7 +31,9 @@ func NewUptimeMeasurer(client *clientv3.Client, interval time.Duration) (*uptime
 	key := fmt.Sprintf("test-key-%s", guid.String())
 	value := fmt.Sprintf("test-value-%s", guid.String())
 
-	_, err := client.Put(context.Background(), key, value)
+	ctx, cancel := context.WithTimeout(context.Background(), etcdOperationTimeout)
+	defer cancel()
+	_, err := client.Put(ctx, key, value)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +58,7 @@ func (u *uptimeMeasurer) Start() {
 			case <-u.cancelled:
 				return
 			case <-timer.C:
-				ctx, cancel := context.WithTimeout(context.Background(), etcdReadTimeout)
+				ctx, cancel := context.WithTimeout(context.Background(), etcdOperationTimeout)
 				resp, err := u.client.Get(ctx, u.key)
 				u.incrementTotalCount()
 				cancel()
@@ -91,7 +93,9 @@ func (u *uptimeMeasurer) Stop() {
 
 func (u *uptimeMeasurer) Cleanup() error {
 	<-u.cancelled
-	_, err := u.client.Delete(context.Background(), u.key)
+	ctx, cancel := context.WithTimeout(context.Background(), etcdOperationTimeout)
+	defer cancel()
+	_, err := u.client.Delete(ctx, u.key)
 	return err
 }
 

@@ -18,7 +18,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const etcdReadTimeout = 10 * time.Second
+const etcdOperationTimeout = 10 * time.Second
 
 var (
 	configPath string
