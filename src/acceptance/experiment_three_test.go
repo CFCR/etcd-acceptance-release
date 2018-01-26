@@ -44,7 +44,7 @@ var _ = Describe("Experiment Three", func() {
 		Expect(isolateZoneTwoIncident.HasTaskErrors()).To(BeFalse())
 
 		By("Waiting for reads to start failing")
-		Eventually(readRootKey(client), 3*etcdReadTimeout).Should(HaveOccurred())
+		Eventually(readRootKey(client), 3*etcdOperationTimeout).Should(HaveOccurred())
 
 		By("Starting the total network partition measurer")
 		totalNetworkPartitionMeasurer.Start()
