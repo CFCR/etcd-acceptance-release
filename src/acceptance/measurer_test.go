@@ -92,7 +92,6 @@ func (u *uptimeMeasurer) Stop() {
 }
 
 func (u *uptimeMeasurer) Cleanup() error {
-	<-u.cancelled
 	ctx, cancel := context.WithTimeout(context.Background(), etcdOperationTimeout)
 	defer cancel()
 	_, err := u.client.Delete(ctx, u.key)
