@@ -41,7 +41,7 @@ func unblockIP(deployment, instanceGroup, index, targetIP string, director boshd
 func cleanupIptables(deployment, instanceGroup, index string, director boshdir.Director) {
 	host, username, privateKey, err := getSSHCreds(deployment, instanceGroup, index, director)
 	Expect(err).NotTo(HaveOccurred())
-	_, err = runSSHCommand(host, 22, username, privateKey, "sudo iptables -D INPUT 1 && sudo iptables -D OUTPUT 1")
+	_, err = runSSHCommand(host, 22, username, privateKey, "sudo iptables -F")
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cleanupSSHCreds(deployment, instanceGroup, index, director)).To(Succeed())
 }

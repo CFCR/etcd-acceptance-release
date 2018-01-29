@@ -73,6 +73,10 @@ var _ = BeforeSuite(func() {
 
 var _ = AfterEach(func() {
 	By("Waiting for all nodes to be running")
+	cleanupIptables(cfg.DeploymentName, "etcd", "0", director)
+	cleanupIptables(cfg.DeploymentName, "etcd", "1", director)
+	cleanupIptables(cfg.DeploymentName, "etcd", "2", director)
+
 	Eventually(func() error {
 		dep, err := director.FindDeployment(cfg.DeploymentName)
 		Expect(err).NotTo(HaveOccurred())
