@@ -33,7 +33,7 @@ func createNodeIncident(turbClient turbclient.Turbulence, deployment, zone strin
 func unblockIP(deployment, instanceGroup, index, targetIP string, director boshdir.Director) {
 	host, username, privateKey, err := getSSHCreds(deployment, instanceGroup, index, director)
 	Expect(err).NotTo(HaveOccurred())
-	_, err = runSSHCommand(host, 22, username, privateKey, fmt.Sprintf("sudo iptables -I INPUT 1 -s %s -j ACCEPT && sudo iptables -I OUTPUT 1 -s %s -j ACCEPT", targetIP, targetIP))
+	_, err = runSSHCommand(host, 22, username, privateKey, fmt.Sprintf("sudo iptables -I INPUT 1 -s %s -j ACCEPT && sudo iptables -I OUTPUT 1 -d %s -j ACCEPT", targetIP, targetIP))
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cleanupSSHCreds(deployment, instanceGroup, index, director)).To(Succeed())
 }
