@@ -21,7 +21,8 @@ type uptimeMeasurer struct {
 
 	interval time.Duration
 
-	client *clientv3.Client
+	client  *clientv3.Client
+	stopped bool
 
 	lock *sync.Mutex
 }
@@ -87,8 +88,13 @@ func (u *uptimeMeasurer) Start() {
 }
 
 func (u *uptimeMeasurer) Stop() {
+	if u.isStopped() {
+		return
+	}
+
 	u.cancelled <- struct{}{}
 	close(u.cancelled)
+	u.setStopped()
 }
 
 func (u *uptimeMeasurer) Cleanup() error {
@@ -128,4 +134,18 @@ func (u *uptimeMeasurer) ActualDeviation() float64 {
 	u.lock.Lock()
 	defer u.lock.Unlock()
 	return float64(u.failedCount) / float64(u.totalCount)
+}
+
+func (u *uptimeMeasurer) setStopped() {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+
+	u.stopped = true
+}
+
+func (u *uptimeMeasurer) isStopped() bool {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+
+	return u.stopped
 }

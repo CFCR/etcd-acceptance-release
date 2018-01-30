@@ -55,6 +55,7 @@ func measurerExpectations(measurer *uptimeMeasurer, comparisonOperator string, r
 }
 
 func cleanupMeasurer(measurer *uptimeMeasurer) {
+	measurer.Stop()
 	Expect(measurer.Cleanup()).To(Succeed())
 }
 

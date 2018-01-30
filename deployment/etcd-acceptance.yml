@@ -75,6 +75,17 @@ instance_groups:
       director_client_secret: ((director-client-secret))
       director_url: ((director-url))
       uaa_url: ((uaa-url))
+  - name: read-availability-during-network-partition-granular
+    release: etcd-acceptance
+    consumes:
+      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
+      turbulence: {from: api, deployment: turbulence}
+    properties:
+      deployment_name: ((etcd-deployment-name))
+      director_ca: ((director-ca))
+      director_client_secret: ((director-client-secret))
+      director_url: ((director-url))
+      uaa_url: ((uaa-url))
 
 update:
   serial: true

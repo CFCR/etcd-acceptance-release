@@ -1,0 +1,32 @@
+<%
+def node_name(instance)
+  # As specified in kubo-etcd https://github.com/pivotal-cf-experimental/kubo-etcd/blob/8cc5af9c47e15b6c9eebb0712b0fa50a8c700241/src/etcdfab/config/config.go#L106-L111
+  "#{instance.name.gsub('_','-')}-#{instance.index}"
+end
+
+etcd_addresses = link('etcd').instances.map { |instance| instance.address }
+aliases = []
+
+etcd_advertise_urls_dns_suffix = link('etcd').p('etcd.advertise_urls_dns_suffix')
+etcd_endpoints = link('etcd').instances.map { |instance| "https://#{node_name(instance)}.#{etcd_advertise_urls_dns_suffix}:4001" }
+
+config = {
+  endpoints: etcd_endpoints,
+  client_cert_path: "/var/vcap/jobs/read-availability-during-network-partition-granular/config/client.crt",
+  client_key_path: "/var/vcap/jobs/read-availability-during-network-partition-granular/config/client.key",
+  client_ca_path: "/var/vcap/jobs/read-availability-during-network-partition-granular/config/client-ca.crt",
+  director_client: p("director_client"),
+  director_client_secret: p("director_client_secret"),
+  director_ca: p("director_ca"),
+  director_url: p("director_url"),
+  deployment_name: p("deployment_name"),
+  uaa_url: p("uaa_url"),
+  read_tolerance: 0,
+  turbulence_host: link("turbulence").instances.first.address,
+  turbulence_port: 8080,
+  turbulence_user: link("turbulence").p("username"),
+  turbulence_password: link("turbulence").p("password"),
+  turbulence_ca_cert: link("turbulence").p("cert.ca"),
+}
+%>
+<%= config.to_json %>
