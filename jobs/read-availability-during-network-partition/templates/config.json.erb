@@ -1,14 +1,23 @@
 <%
+
 def node_name(instance)
   # As specified in kubo-etcd https://github.com/pivotal-cf-experimental/kubo-etcd/blob/8cc5af9c47e15b6c9eebb0712b0fa50a8c700241/src/etcdfab/config/config.go#L106-L111
   "#{instance.name.gsub('_','-')}-#{instance.index}"
 end
 
-etcd_addresses = link('etcd').instances.map { |instance| instance.address }
-aliases = []
+etcd_endpoints = []
 
-etcd_advertise_urls_dns_suffix = link('etcd').p('etcd.advertise_urls_dns_suffix')
-etcd_endpoints = link('etcd').instances.map { |instance| "https://#{node_name(instance)}.#{etcd_advertise_urls_dns_suffix}:4001" }
+link('etcd').if_p('etcd.advertise_urls_dns_suffix') do
+  etcd_addresses = link('etcd').instances.map { |instance| instance.address }
+  aliases = []
+
+  etcd_advertise_urls_dns_suffix = link('etcd').p('etcd.advertise_urls_dns_suffix')
+  etcd_endpoints = link('etcd').instances.map { |instance| "https://#{node_name(instance)}.#{etcd_advertise_urls_dns_suffix}:4001" }
+end
+
+link('etcd').if_p('client_port') do
+  etcd_endpoints = link('etcd').instances.map { |peer| "https://#{peer.address}:#{link("etcd").p("client_port")}" }
+end
 
 config = {
   endpoints: etcd_endpoints,

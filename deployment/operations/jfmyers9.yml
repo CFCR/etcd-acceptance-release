@@ -1,0 +1,22 @@
+---
+- type: remove
+  path: /releases/name=kubo-etcd
+
+- type: remove
+  path: /instance_groups/name=etcd-acceptance/jobs/name=etcd-bosh-dns-aliases
+
+- type: replace
+  path: /instance_groups/name=etcd-acceptance/jobs/name=read-availability-during-recreate/consumes/etcd/from
+  value: etcd_client
+
+- type: replace
+  path: /instance_groups/name=etcd-acceptance/jobs/name=read-availability-during-network-partition/consumes/etcd/from
+  value: etcd_client
+
+- type: replace
+  path: /instance_groups/name=etcd-acceptance/jobs/name=read-availability-during-network-partition-granular/consumes/etcd/from
+  value: etcd_client
+
+- type: replace
+  path: /instance_groups/name=etcd-acceptance/jobs/name=read-availability-during-total-network-partition/consumes/etcd/from
+  value: etcd_client
