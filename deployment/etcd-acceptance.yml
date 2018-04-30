@@ -10,7 +10,7 @@ releases:
 - name: etcd-acceptance
   version: latest
 - name: bosh-dns
-  version: latest
+  version: 0.2.0
 
 features:
   use_dns_addresses: true
