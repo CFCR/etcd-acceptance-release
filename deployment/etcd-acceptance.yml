@@ -9,8 +9,6 @@ stemcells:
 releases:
 - name: etcd-acceptance
   version: latest
-- name: kubo-etcd
-  version: latest
 - name: bosh-dns
   version: latest
 
@@ -38,10 +36,6 @@ instance_groups:
   stemcell: default
   networks: [{name: default}]
   jobs:
-  - name: etcd-bosh-dns-aliases
-    release: kubo-etcd
-    consumes:
-      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
   - name: read-availability-during-recreate
     release: etcd-acceptance
     consumes:
