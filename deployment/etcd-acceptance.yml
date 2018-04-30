@@ -39,7 +39,7 @@ instance_groups:
   - name: read-availability-during-recreate
     release: etcd-acceptance
     consumes:
-      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
+      etcd: {from: etcd, deployment: ((etcd-deployment-name))}
       turbulence: {from: api, deployment: turbulence}
     properties:
       deployment_name: ((etcd-deployment-name))
@@ -50,7 +50,7 @@ instance_groups:
   - name: read-availability-during-network-partition
     release: etcd-acceptance
     consumes:
-      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
+      etcd: {from: etcd, deployment: ((etcd-deployment-name))}
       turbulence: {from: api, deployment: turbulence}
     properties:
       deployment_name: ((etcd-deployment-name))
@@ -61,7 +61,7 @@ instance_groups:
   - name: read-availability-during-total-network-partition
     release: etcd-acceptance
     consumes:
-      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
+      etcd: {from: etcd, deployment: ((etcd-deployment-name))}
       turbulence: {from: api, deployment: turbulence}
     properties:
       deployment_name: ((etcd-deployment-name))
@@ -72,7 +72,7 @@ instance_groups:
   - name: read-availability-during-network-partition-granular
     release: etcd-acceptance
     consumes:
-      etcd: {from: etcd_server, deployment: ((etcd-deployment-name))}
+      etcd: {from: etcd, deployment: ((etcd-deployment-name))}
       turbulence: {from: api, deployment: turbulence}
     properties:
       deployment_name: ((etcd-deployment-name))

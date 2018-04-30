@@ -7,11 +7,11 @@ end
 
 etcd_endpoints = []
 
-link('etcd').if_p('etcd.advertise_urls_dns_suffix') do
+link('etcd').if_p('etcd.dns_suffix') do
   etcd_addresses = link('etcd').instances.map { |instance| instance.address }
   aliases = []
 
-  etcd_advertise_urls_dns_suffix = link('etcd').p('etcd.advertise_urls_dns_suffix')
+  etcd_advertise_urls_dns_suffix = link('etcd').p('etcd.dns_suffix')
   etcd_endpoints = link('etcd').instances.map { |instance| "https://#{node_name(instance)}.#{etcd_advertise_urls_dns_suffix}:4001" }
 end
 
