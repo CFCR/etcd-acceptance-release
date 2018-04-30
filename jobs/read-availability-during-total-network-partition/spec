@@ -23,7 +23,7 @@ properties:
 
 consumes:
 - name: etcd
-  type: etcd_service
+  type: etcd
 - name: turbulence
   type: turbulence_api
 
