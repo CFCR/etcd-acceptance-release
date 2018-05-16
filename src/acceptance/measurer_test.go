@@ -49,6 +49,24 @@ func NewUptimeMeasurer(client *clientv3.Client, interval time.Duration) (*uptime
 	}, nil
 }
 
+func (u *uptimeMeasurer) UpdateValidKeyValue() error {
+	guid := uuid.NewV4()
+	key := fmt.Sprintf("test-key-%s", guid.String())
+	value := fmt.Sprintf("test-value-%s", guid.String())
+	ctx, cancel := context.WithTimeout(context.Background(), etcdOperationTimeout)
+	defer cancel()
+	_, err := client.Put(ctx, key, value)
+	if err != nil {
+		return err
+	}
+	u.lock.Lock()
+	defer u.lock.Unlock()
+	u.key = key
+	u.value = value
+
+	return nil
+}
+
 func (u *uptimeMeasurer) Start() {
 	go func() {
 		timer := time.NewTimer(u.interval)
@@ -60,7 +78,8 @@ func (u *uptimeMeasurer) Start() {
 				return
 			case <-timer.C:
 				ctx, cancel := context.WithTimeout(context.Background(), etcdOperationTimeout)
-				resp, err := u.client.Get(ctx, u.key)
+				key, value := u.getKeyValue()
+				resp, err := u.client.Get(ctx, key)
 				u.incrementTotalCount()
 				cancel()
 				if err != nil {
@@ -76,9 +95,10 @@ func (u *uptimeMeasurer) Start() {
 				}
 
 				for _, kv := range resp.Kvs {
-					if string(kv.Key) != u.key || string(kv.Value) != u.value {
+					if string(kv.Key) != key || string(kv.Value) != value {
 						u.incrementFailedCount()
-						fmt.Printf("Encountered failure (#%d): Mismatching Values: expected %s got %s\n", u.getFailedCount(), u.value, string(kv.Value))
+						fmt.Printf("Encountered failure (#%d): Mismatching Values: expected key %s, got key %s. Expected value %s got %s\n",
+							u.getFailedCount(), key, string(kv.Key), value, string(kv.Value))
 						break
 					}
 				}
@@ -122,6 +142,12 @@ func (u *uptimeMeasurer) getFailedCount() int {
 	defer u.lock.Unlock()
 
 	return u.failedCount
+}
+
+func (u *uptimeMeasurer) getKeyValue() (string, string) {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+	return u.key, u.value
 }
 
 func (u *uptimeMeasurer) Counts() (int, int) {

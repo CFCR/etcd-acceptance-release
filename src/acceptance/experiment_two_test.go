@@ -11,7 +11,7 @@ import (
 var _ = Describe("Experiment Two", func() {
 	It("maintains uptime through network partition and job restarts", func() {
 		By("Creating the measurer")
-		measurer, err := NewUptimeMeasurer(client, time.Second)
+		measurer, err := NewUptimeMeasurer(client, 500*time.Millisecond)
 		Expect(err).NotTo(HaveOccurred())
 		defer cleanupMeasurer(measurer)
 
@@ -24,6 +24,7 @@ var _ = Describe("Experiment Two", func() {
 		unblockIP(cfg.DeploymentName, "etcd", "0", clientIP, director)
 		isolatedNodeIncident := createNodeIncident(turbClient, cfg.DeploymentName, "z1")
 		Expect(isolatedNodeIncident.HasTaskErrors()).To(BeFalse())
+		Expect(measurer.UpdateValidKeyValue()).NotTo(HaveOccurred())
 
 		By("Restarting ETCD 0 (z1)")
 		restartEtcdNode(cfg.DeploymentName, "etcd", "0", director)
