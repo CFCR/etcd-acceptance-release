@@ -1,9 +1,11 @@
 # CFCR etcd-acceptance-tests
 
-## Deploy bosh-lite
+## Deploy bosh-lite (optional)
 ```
 blup up # deploy bosh lite
 source ~/workspace/deployments/bosh-lite/bosh-env
+cd ~/workspace/kubo-deployment
+./bin/deploy_cfcr # this uploads the cloud config settings.  You can delete the deployment after.
 ```
 
 ## Deploy turbulence release

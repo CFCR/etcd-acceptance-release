@@ -23,7 +23,7 @@ var _ = Describe("Experiment Three", func() {
 
 		By("Stopping the initial measurer")
 		initialMeasurer.Stop()
-		measurerExpectations(initialMeasurer, "<=", cfg.ReadTolerance)
+		measurerExpectations(initialMeasurer, "<=", cfg.ReadTolerance, deadlineErrorsTolerance)
 
 		By("Creating the total network partition measurer")
 		totalNetworkPartitionMeasurer, err := NewUptimeMeasurer(client, time.Second)
@@ -54,7 +54,7 @@ var _ = Describe("Experiment Three", func() {
 
 		By("Stopping the total network partition measurer")
 		totalNetworkPartitionMeasurer.Stop()
-		measurerExpectations(totalNetworkPartitionMeasurer, ">=", 1.00)
+		measurerExpectations(totalNetworkPartitionMeasurer, ">=", 1.00, deadlineErrorsTolerance)
 
 		By("Lifting the partition on the ETCD 1 (z2) node")
 		unIsolateNode(isolateZoneTwoIncident, cfg.DeploymentName, "1", director)
@@ -71,7 +71,7 @@ var _ = Describe("Experiment Three", func() {
 
 		By("Checking the state of the cluster")
 		time.Sleep(60 * time.Second)
-		measurerExpectations(partialNetworkPartitionMeasurer, "<=", cfg.ReadTolerance)
+		measurerExpectations(partialNetworkPartitionMeasurer, "<=", cfg.ReadTolerance, deadlineErrorsTolerance)
 
 		By("Lifting the partition on the ETCD 0 (z1) node")
 		unIsolateNode(isolateZoneOneIncident, cfg.DeploymentName, "0", director)
@@ -81,6 +81,6 @@ var _ = Describe("Experiment Three", func() {
 
 		By("Stopping the total network partition measurer")
 		partialNetworkPartitionMeasurer.Stop()
-		measurerExpectations(partialNetworkPartitionMeasurer, "<=", cfg.ReadTolerance)
+		measurerExpectations(partialNetworkPartitionMeasurer, "<=", cfg.ReadTolerance, deadlineErrorsTolerance)
 	})
 })

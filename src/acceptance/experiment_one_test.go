@@ -27,6 +27,6 @@ var _ = Describe("Experiment One", func() {
 		measurer.Stop()
 
 		By("Fetching the measurer's counts")
-		measurerExpectations(measurer, "<=", cfg.ReadTolerance)
+		measurerExpectations(measurer, "<=", cfg.ReadTolerance, deadlineErrorsTolerance)
 	})
 })

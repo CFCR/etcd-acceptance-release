@@ -19,6 +19,7 @@ import (
 )
 
 const etcdOperationTimeout = 10 * time.Second
+const deadlineErrorsTolerance = 3
 
 var (
 	configPath string

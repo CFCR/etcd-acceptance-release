@@ -11,8 +11,9 @@ import (
 )
 
 type uptimeMeasurer struct {
-	failedCount int
-	totalCount  int
+	deadlineCount int
+	failedCount   int
+	totalCount    int
 
 	cancelled chan struct{}
 
@@ -83,8 +84,8 @@ func (u *uptimeMeasurer) Start() {
 				u.incrementTotalCount()
 				cancel()
 				if err != nil {
-					u.incrementFailedCount()
-					fmt.Printf("Encountered failure (#%d): %s\n", u.getFailedCount(), err.Error())
+					u.incrementDeadlineCount()
+					fmt.Printf("Encountered failure (#%d): %s\n", u.getDeadlineCount(), err.Error())
 					continue
 				}
 
@@ -124,6 +125,13 @@ func (u *uptimeMeasurer) Cleanup() error {
 	return err
 }
 
+func (u *uptimeMeasurer) incrementDeadlineCount() {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+
+	u.deadlineCount++
+}
+
 func (u *uptimeMeasurer) incrementTotalCount() {
 	u.lock.Lock()
 	defer u.lock.Unlock()
@@ -135,6 +143,13 @@ func (u *uptimeMeasurer) incrementFailedCount() {
 	u.lock.Lock()
 	defer u.lock.Unlock()
 	u.failedCount++
+}
+
+func (u *uptimeMeasurer) getDeadlineCount() int {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+
+	return u.deadlineCount
 }
 
 func (u *uptimeMeasurer) getFailedCount() int {
@@ -150,10 +165,10 @@ func (u *uptimeMeasurer) getKeyValue() (string, string) {
 	return u.key, u.value
 }
 
-func (u *uptimeMeasurer) Counts() (int, int) {
+func (u *uptimeMeasurer) Counts() (int, int, int) {
 	u.lock.Lock()
 	defer u.lock.Unlock()
-	return u.totalCount, u.failedCount
+	return u.totalCount, u.failedCount, u.deadlineCount
 }
 
 func (u *uptimeMeasurer) ActualDeviation() float64 {

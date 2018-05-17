@@ -46,9 +46,11 @@ func cleanupIptables(deployment, instanceGroup, index string, director boshdir.D
 	Expect(cleanupSSHCreds(deployment, instanceGroup, index, director)).To(Succeed())
 }
 
-func measurerExpectations(measurer *uptimeMeasurer, comparisonOperator string, readTolerance float64) {
-	total, failed := measurer.Counts()
+func measurerExpectations(measurer *uptimeMeasurer, comparisonOperator string, readTolerance float64, deadlinesTolerance int) {
+	total, failed, deadlineErrors := measurer.Counts()
 	Expect(total).To(BeNumerically(">", 0), "No reads undertaken")
+	By(fmt.Sprintf("Checking the amount of deadline errors: total calls: %d, errors: %d", total, deadlineErrors))
+	Expect(deadlineErrors).To(BeNumerically(comparisonOperator, deadlinesTolerance), "Too many deadline errors")
 	actualDeviation := measurer.ActualDeviation()
 	By(fmt.Sprintf("Calculating the deviation of failures: total: %d, failed: %d, deviation: %.5f", total, failed, actualDeviation))
 	Expect(actualDeviation).To(BeNumerically(comparisonOperator, readTolerance))
