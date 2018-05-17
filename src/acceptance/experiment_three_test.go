@@ -54,7 +54,7 @@ var _ = Describe("Experiment Three", func() {
 
 		By("Stopping the total network partition measurer")
 		totalNetworkPartitionMeasurer.Stop()
-		measurerExpectations(totalNetworkPartitionMeasurer, ">=", 1.00, deadlineErrorsTolerance)
+		measurerExpectations(totalNetworkPartitionMeasurer, ">=", 0, 1)
 
 		By("Lifting the partition on the ETCD 1 (z2) node")
 		unIsolateNode(isolateZoneTwoIncident, cfg.DeploymentName, "1", director)
